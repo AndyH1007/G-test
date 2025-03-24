@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>聲望加減示範</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 800px; margin: auto; background: #f9f9f9; }
+    .card { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fff; }
+    .selected { border: 2px solid #00796b; background: #e0f2f1; }
+    .result { padding: 1rem; margin-top: 1rem; font-weight: bold; background: #f1f8e9; border-left: 5px solid #8bc34a; }
+  </style>
+</head>
+<body>
+
+<h2>🎨 請選擇藝術家（模擬）</h2>
+<div id="artistCards"></div>
+<div id="result" class="result" style="display:none;"></div>
+
+<script>
+const materialPrefs = ["裝置", "繪畫", "錄像", "雕塑", "其他"];
+const conceptPrefs = ["當代觀念", "經典", "批判"];
+
+const artists = [
+  { name: "藝術家 A", material: "裝置", concept: "當代觀念" },
+  { name: "藝術家 B", material: "錄像", concept: "批判" },
+  { name: "藝術家 C", material: "雕塑", concept: "經典" }
+];
+
+function calculateReputation(artist) {
+  const mIndex = materialPrefs.indexOf(artist.material);
+  const cIndex = conceptPrefs.indexOf(artist.concept);
+
+  const materialScore = 2 - mIndex;
+  const conceptScore = 2 - cIndex;
+  const total = materialScore + conceptScore;
+
+  return { total, detail: `媒材：${artist.material}（${materialScore >= 0 ? "+" : ""}${materialScore}）｜概念：${artist.concept}（${conceptScore >= 0 ? "+" : ""}${conceptScore}）` };
+}
+
+function selectArtist(index) {
+  document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
+  const card = document.getElementById("artist-" + index);
+  card.classList.add("selected");
+
+  const artist = artists[index];
+  const rep = calculateReputation(artist);
+  const result = document.getElementById("result");
+  result.style.display = "block";
+  result.innerText = `選擇 ${artist.name}：聲望變化 ${rep.total >= 0 ? "+" : ""}${rep.total} 分｜${rep.detail}`;
+}
+
+function render() {
+  const container = document.getElementById("artistCards");
+  artists.forEach((a, i) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.id = "artist-" + i;
+    div.innerHTML = `<strong>${a.name}</strong><br>媒材：${a.material}<br>概念：${a.concept}`;
+    div.onclick = () => selectArtist(i);
+    container.appendChild(div);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
