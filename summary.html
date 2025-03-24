@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>年終報告</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>年終報告 📊</h1>
+  <p>畫廊名稱：<span id="name"></span></p>
+  <p>最終資金：<span id="money"></span></p>
+  <p>最終聲望：<span id="reputation"></span></p>
+
+  <canvas id="moneyChart" width="400" height="200"></canvas>
+  <canvas id="reputationChart" width="400" height="200"></canvas>
+  <canvas id="rateChart" width="400" height="200"></canvas>
+
+  <script>
+    const state = JSON.parse(localStorage.getItem("my_gallery_state"));
+    document.getElementById("name").innerText = state.galleryName;
+    document.getElementById("money").innerText = state.money;
+    document.getElementById("reputation").innerText = state.reputation;
+
+    const labels = state.history.map(h => "第" + h.month + "月");
+    const moneyData = state.history.map(h => h.money);
+    const repData = state.history.map(h => h.reputation);
+    const rateData = state.history.map(h => h.rate || 0);
+
+    const config = (label, data, color) => ({
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{ label, data, fill: false, borderColor: color, tension: 0.1 }]
+      },
+      options: { responsive: true }
+    });
+
+    new Chart(document.getElementById("moneyChart"), config("資金變化", moneyData, "green"));
+    new Chart(document.getElementById("reputationChart"), config("聲望變化", repData, "blue"));
+    new Chart(document.getElementById("rateChart"), config("銷售率變化", rateData, "orange"));
+  </script>
+</body>
+</html>
