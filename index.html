@@ -1,117 +1,154 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>《我的藝廊》完整規則</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的藝廊</title>
   <style>
     body {
       font-family: sans-serif;
-      line-height: 1.6;
-      padding: 2rem;
-      max-width: 960px;
-      margin: auto;
       background: #f9f9f9;
-      color: #222;
+      padding: 2rem;
+      max-width: 700px;
+      margin: auto;
     }
-    h1, h2, h3 {
-      color: #333;
-    }
-    ul {
-      padding-left: 1.5em;
-    }
-    section {
-      margin-bottom: 3rem;
+    .container {
       background: #fff;
       padding: 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-    .title {
-      background-color: #ffe0b2;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      border-left: 6px solid #fb8c00;
+    h1 {
+      color: #333;
+    }
+    button, select, input {
+      margin-top: 10px;
+      padding: 8px;
+      font-size: 1em;
+      width: 100%;
+    }
+    .log {
+      background: #f0f0f0;
+      padding: 10px;
+      margin-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-line;
+    }
+    a {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #007bff;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <div class="title">
-    <h1>《我的藝廊》完整規則</h1>
-    <p>包含：遊戲基本規則 + 突發事件系統</p>
+  <div class="container">
+    <h1>我的藝廊 🎨</h1>
+    <p>請輸入畫廊名稱：</p>
+    <input id="galleryName" placeholder="例如：東海畫坊" />
+    <button onclick="startGame()">開始遊戲</button>
+    <a href="rules.html" target="_blank">📖 查看完整規則</a>
+
+    <div id="game" style="display:none;">
+      <p>畫廊名稱：<span id="title"></span></p>
+      <p>月份：<span id="month"></span> / 12</p>
+      <p>資金：<span id="money"></span>｜聲望：<span id="reputation"></span></p>
+
+      <label>選擇畫廊類型：
+        <select id="galleryType">
+          <option value="commercial">商業畫廊</option>
+          <option value="normal">普通畫廊</option>
+          <option value="alternative">替代空間</option>
+        </select>
+      </label>
+
+      <label>選擇藝術家：
+        <select id="artistType">
+          <option value="new">新進藝術家</option>
+          <option value="mid">中等藝術家</option>
+          <option value="famous">知名藝術家</option>
+        </select>
+      </label>
+
+      <button onclick="nextMonth()">進入下一個月</button>
+      <div class="log" id="log"></div>
+    </div>
   </div>
 
-  <section>
-    <h2>📘 遊戲核心規則簡介</h2>
-    <ul>
-      <li>12 回合代表 12 個月的經營過程</li>
-      <li>玩家需固定選擇畫廊類型、空間尺寸、媒材偏好、概念偏好</li>
-      <li>每月選擇藝術家、執行展前任務、面對隨機突發事件</li>
-      <li>販售作品並獲得聲望與收入</li>
-      <li>最終以聲望與資金評估畫廊表現</li>
-    </ul>
-  </section>
+<script>
+let state = {
+  gallery: '',
+  month: 1,
+  money: 500,
+  reputation: 50,
+  log: [],
+  history: []
+};
 
-  <section>
-    <h2>🎭 角色創建階段（遊戲開始）</h2>
-    <ul>
-      <li>輸入畫廊名稱</li>
-      <li>選擇畫廊類型（固定）</li>
-      <li>選擇展覽空間尺寸（固定）</li>
-      <li>排列媒材偏好順序（固定）</li>
-      <li>排列概念偏好順序（固定）</li>
-    </ul>
-  </section>
+function startGame() {
+  const name = document.getElementById('galleryName').value.trim();
+  if (!name) return alert('請輸入畫廊名稱');
+  state.gallery = name;
+  const saved = localStorage.getItem('gallery_' + name);
+  if (saved) {
+    state = JSON.parse(saved);
+  }
+  document.getElementById('game').style.display = 'block';
+  document.getElementById('title').innerText = state.gallery;
+  updateUI();
+}
 
-  <section>
-    <h2>🔁 每月回合流程</h2>
-    <ol>
-      <li>支付開銷（租金與營運成本）</li>
-      <li>從隨機生成的藝術家中選擇合作對象（卡牌式）</li>
-      <li>選擇最多兩項展前任務</li>
-      <li>觸發隨機突發事件</li>
-      <li>執行任務與布展（有失敗風險）</li>
-      <li>擲骰販售藝術品，並結算收入與聲望</li>
-      <li>更新畫廊狀態並儲存</li>
-    </ol>
-  </section>
+function updateUI() {
+  document.getElementById('month').innerText = state.month;
+  document.getElementById('money').innerText = state.money;
+  document.getElementById('reputation').innerText = state.reputation;
+  document.getElementById('log').innerText = state.log.join('\n');
+}
 
-  <section>
-    <h2>📉 突發事件規則</h2>
-    <h3>🎲 事件觸發規則</h3>
-    <ul>
-      <li>每月隨機觸發 1 次事件，一年內不重複</li>
-      <li>替代空間類型玩家可重擲一次</li>
-      <li>負面事件 60%，正面事件 40%</li>
-      <li>影響即時生效至月底</li>
-    </ul>
+function nextMonth() {
+  const galleryCost = { commercial: 20, normal: 10, alternative: 5 };
+  const rentCost = { commercial: 80, normal: 50, alternative: 20 };
+  const sellChance = { commercial: 15, normal: 10, alternative: 5 };
+  const artistCost = { new: 5, mid: 20, famous: 50 };
+  const artistChance = { new: 10, mid: 20, famous: 30 };
+  const repMod = Math.floor((state.reputation - 50) / 10) * 3;
+  const priceRange = [60, 120];
 
-    <h3>🛡️ 應對機制</h3>
-    <ul>
-      <li>聲望 &lt; 50：保費 20 金幣，可減半損失</li>
-      <li>聲望 ≥ 50：保費 30 金幣，可減半損失</li>
-      <li>可使用公益展覽等方式補償聲望損失</li>
-    </ul>
+  const gType = document.getElementById('galleryType').value;
+  const aType = document.getElementById('artistType').value;
 
-    <h3>❌ 負面事件範例</h3>
-    <ul>
-      <li>主理人品行不佳：聲望 -5</li>
-      <li>布展作品損壞：支付 50 金幣，作品無法售出</li>
-      <li>租金上漲：下月租金調整（小+5 / 中+10 / 大+20）</li>
-    </ul>
+  const cost = rentCost[gType] + galleryCost[gType] + artistCost[aType];
+  state.money -= cost;
 
-    <h3>✅ 正面事件範例</h3>
-    <ul>
-      <li>文化活動加持：當月販售率 +10%</li>
-      <li>獲得贊助：+80 金幣，聲望 +5</li>
-      <li>作品得獎：聲望 +15，售價 +10%</li>
-    </ul>
+  let chance = sellChance[gType] + artistChance[aType] + repMod;
+  const dice = Math.floor(Math.random() * 100) + 1;
+  let sold = dice <= chance;
 
-    <h3>⚖️ 中性事件範例</h3>
-    <ul>
-      <li>藝術家即興創作：布展費 +15 金幣，聲望 +3</li>
-      <li>展覽過度擁擠：聲望 +3，營運費 +10 金幣</li>
-    </ul>
-  </section>
+  let income = 0;
+  if (sold) {
+    income = Math.floor(Math.random() * (priceRange[1] - priceRange[0])) + priceRange[0];
+    state.money += income;
+    state.reputation += 2;
+  } else {
+    state.reputation -= 1;
+  }
+
+  const logMsg = `第${state.month}月｜選擇 ${gType} 畫廊、合作 ${aType} 藝術家，支出 ${cost} 金幣。\n` +
+                 (sold ? `售出作品獲得 ${income} 金幣，聲望 +2。` : `未售出，聲望 -1。`);
+  state.log.push(logMsg);
+  state.history.push({ month: state.month, cost, income, sold, rep: state.reputation });
+  state.month++;
+
+  if (state.month > 12) {
+    alert('遊戲結束！請查看控制台資料或重新開始。');
+    localStorage.removeItem('gallery_' + state.gallery);
+  } else {
+    localStorage.setItem('gallery_' + state.gallery, JSON.stringify(state));
+    updateUI();
+  }
+}
+</script>
 </body>
 </html>
