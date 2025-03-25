@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="UTF-8"><title>年終報告</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head>
+<body>
+<h1>年終報告</h1>
+<p>畫廊：<span id="galleryName"></span></p>
+<p>資金：<span id="money"></span></p>
+<p>聲望：<span id="reputation"></span></p>
+<canvas id="moneyChart" width="400" height="150"></canvas>
+<canvas id="repChart" width="400" height="150"></canvas>
+<script>
+const state = JSON.parse(localStorage.getItem('my_gallery_state'));
+document.getElementById('galleryName').textContent = state.galleryName;
+document.getElementById('money').textContent = state.money;
+document.getElementById('reputation').textContent = state.reputation;
+
+new Chart(document.getElementById("moneyChart"), {
+  type: "line",
+  data: {
+    labels: state.history.map(h => "第" + h.month + "月"),
+    datasets: [{ label: "金錢", data: state.history.map(h => h.money), borderColor: "green" }]
+  }
+});
+new Chart(document.getElementById("repChart"), {
+  type: "line",
+  data: {
+    labels: state.history.map(h => "第" + h.month + "月"),
+    datasets: [{ label: "聲望", data: state.history.map(h => h.reputation), borderColor: "blue" }]
+  }
+});
+</script>
+</body></html>

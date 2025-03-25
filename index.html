@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="UTF-8"><title>開始遊戲</title></head>
+<body>
+<h1>我的藝廊</h1>
+<form onsubmit="startGame(); return false;">
+<label>畫廊名稱：<input id="galleryName" required></label><br>
+<label>畫廊類型：
+  <select id="galleryType">
+    <option value="commercial">商業畫廊</option>
+    <option value="normal">一般畫廊</option>
+    <option value="alternative">替代空間</option>
+  </select>
+</label><br>
+<label>空間大小：
+  <select id="gallerySize">
+    <option value="large">大型（9格）</option>
+    <option value="medium">中型（6格）</option>
+    <option value="small">小型（3格）</option>
+  </select>
+</label><br>
+<button type="submit">下一步</button>
+</form>
+<script>
+function startGame() {
+  const state = {
+    galleryName: document.getElementById('galleryName').value,
+    type: document.getElementById('galleryType').value,
+    size: document.getElementById('gallerySize').value,
+    money: 500,
+    reputation: 50,
+    month: 1,
+    preferences: {},
+    history: []
+  };
+  localStorage.setItem('my_gallery_state', JSON.stringify(state));
+  window.location.href = 'preferences.html';
+}
+</script>
+</body></html>
